@@ -1,0 +1,206 @@
+<section class="container mt-3 mb-0">
+<div class="row p-3 ">
+
+<article class="col-md-8 p-0">
+<div class="p-3">
+<h2 class="fw-semibold">{{wordpress.config.widget_featured}}</h2>
+</div>
+
+<div class="p-3 border-widget-end border-widget-top">
+    <div class="row p-2">
+        {% set featured_sticky_posts = wordpress.posts | filterBySticky(true) | limit(3) %}
+        {% set counter = 0 %}
+        {% for post in featured_sticky_posts %}
+            {% if counter == 0 %}
+            <div class="col-md-12 mb-3 mt-3">
+                <div class="p-1 borderio">
+                    <div class="rounded-3 border border-dark">
+                        <div class="image-wrapper rounded-top-3">
+                            <a href="/post/{{ post.slug }}/">
+                                <img class="img-fluid img-cover rounded-top-3" width="100%" height="100%" 
+                                alt="{{post.title}}"
+                                src="{{post.featuredImage or wordpress.config.image }}"/>
+                            </a>
+                        </div>
+                        <div class="p-3 border-dark border-bottom">
+                            <h3 class="fw-semibold mb-5 normal">
+                                <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+                            </h3>
+                        </div>
+                        <p class="row text-secondary mb-0 p-3">
+                            <span class="col-7"> 
+                                {{ post.category_names[0] | default('Kategori') }}
+                            </span>
+                            <span class="col-5 text-end"> 
+                                {{ post.date | readableDate }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-md-6 mb-3 ">
+                <div class="p-1 borderio">
+                    <div class="rounded-3 border border-dark">
+                        <div class="image-wrapper-sub rounded-top-3">
+                            <a href="/post/{{ post.slug }}/"><img class="img-fluid img-cover rounded-top-3" width="100%" height="100%" 
+                            alt="{{post.title}}"
+                            src="{{post.featuredImage or wordpress.config.image }}"/></a>
+                        </div>
+                        <div class="p-3 border-dark border-bottom">
+                            <h3 class="fw-semibold mb-5 normal">
+                                <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+                            </h3>
+                        </div>
+                        <p class="row text-secondary mb-0 p-3">
+                            <span class="col-7"> 
+                                {{ post.category_names[0] | default('Kategori') }}
+                            </span>
+                            <span class="col-5 text-end"> 
+                                {{ post.date | readableDate }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %} 
+
+            {% set counter = counter + 1 %}
+        {% endfor %}      
+    </div>
+</div>
+
+<div class="p-3 border-widget-end border-widget-top">
+    <div class="row">
+<h2 class="fw-semibold col-md-8">{{wordpress.config.widget_lastest}}</h2>
+<p class="col-md-4 text-end mt-2">
+<a href="/blog/" class="none">
+{{wordpress.config.widget_button}}
+</a></p>
+</div>
+<div class="row p-2">
+{% set latest_post_large = wordpress.posts | limit(1) %}
+{% for post in latest_post_large %}
+<div class="col-md-12 mb-3 mt-3">
+<div class="p-1 borderio">
+<div class="rounded-3 border border-dark">
+<div class="image-wrapper rounded-top-3">
+<a href="/post/{{ post.slug }}/">
+<img class="img-fluid img-cover rounded-top-3" width="100%" height="100%" 
+alt="{{post.title}}"
+src="{{post.featuredImage or wordpress.config.image }}"/>
+</a>
+</div>
+<div class="p-3 border-dark border-bottom">
+<h3 class="fw-semibold mb-5 normal">
+    <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+</h3>
+</div>
+<p class="row text-secondary mb-0 p-3">
+<span class="col-7"> 
+{{ post.category_names[0] }}
+</span>
+<span class="col-5 text-end">  
+{{ post.date | readableDate }}
+</span>
+</p>
+</div>
+</div>
+</div>
+{% endfor %}
+{% set counter = 0 %}
+{% for post in wordpress.posts | limit(5) %}  
+    {% if counter > 0 %}
+        <div class="col-md-6 mb-3 ">
+            <div class="p-1 borderio">
+                <div class="rounded-3 border border-dark">
+                    <div class="image-wrapper-sub rounded-top-3">
+                        <a href="/post/{{ post.slug }}/"><img class="img-fluid img-cover rounded-top-3" width="100%" height="100%" 
+                        alt="{{post.title}}"
+                        src="{{post.featuredImage or wordpress.config.image }}"/></a>
+                    </div>
+                    <div class="p-3 border-dark border-bottom">
+                        <h3 class="fw-semibold mb-5 normal">
+                            <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+                        </h3>
+                    </div>
+                    <p class="row text-secondary mb-0 p-3">
+                        <span class="col-7"> 
+                            {{ post.category_names[0] | default('Travel') }}
+                        </span>
+                        <span class="col-5 text-end"> 
+                            {{ post.date | readableDate }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}    
+    {% set counter = counter + 1 %}
+{% endfor %}
+</div>
+</div>
+</article>
+
+<div class="col-md-4 p-0">
+<div class="p-3">
+<h3 class="fw-semibold normal s3">{{wordpress.config.widget_lastest}}</h3>
+</div>
+<div class="p-3 border-widget-top">
+    
+    {# SIDEBAR LATEST ARTICLES (3 Post Terbaru) #}
+    {% for post in wordpress.posts | limit(3) %}
+    <div class="col-md-12 mt-3">
+        <div class="p-1 borderio mt-3">
+            <div class="rounded-3 mt-1 border border-dark">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="p-3 border-dark border-bottom">
+                            <p class="fw-semibold mb-3 text-widget">
+                                <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+                            </p>
+                        </div>
+                        <p class="row text-secondary mb-0 p-3 smaller">
+                            <span class="col-5">
+                                {{ post.category_names[0] | default('Categories') }}
+                            </span>
+                            <span class="col-7 text-end"> 
+                                {{ post.date | readableDate }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="image-wrapper-widget rounded-bottom-3">
+                            <a href="/post/{{post.slug}}/">
+                            <img class="img-fluid img-cover rounded-bottom-3" width="100%" height="100%" 
+                            alt="{{post.title}}"
+                            src="{{post.featuredImage or wordpress.config.image }}"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+<div class="p-3"></div>
+<div class="col-md-12 mt-5">
+
+<div class="rounded-3 mt-1 border border-dark p-3 text-center">
+<p class="border-bottom border-dark p-3 fw-bold">{{wordpress.config.widget_social_title}}</p>
+<p class="mt-2">
+{% for key, n in wordpress.config.widget_social_list %}
+    <a title="{{n.title}}" href="{{n.url}}" class="none">
+    <i class="{{n.icon}} me-3 icon"></i>
+    </a>
+{% endfor %}
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</section>

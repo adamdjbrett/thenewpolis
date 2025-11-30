@@ -1,0 +1,41 @@
+<footer class="container-fluid border-dark border-top s4">
+<div class="container">
+<div class="row">
+<div class="col-md-6 col-6 p-3 p-md-5">
+<img class="logo float-start me-3 rounded-3"
+alt="{{wordpress.config.footer_title}}"
+width="80px"
+height="80px"
+src="{{wordpress.config.footer_logo}}"/>
+<h3>
+<a href="{{wordpress.config.url}}" class="none">{{wordpress.config.footer_title}}</a></h3>
+<p class="mb-3">
+{{wordpress.config.footer_text}}
+</p>
+</div>
+<div class="col-6 col-md-3 offset-md-3 p-3 p-md-5">
+<h3 class="fw-bold border-dark border-bottom mb-3">Contact</h3>
+<p class="mb-3">
+<a href="{{wordpress.config.footer_url}}">{{wordpress.config.footer_contact_info}}</a>
+</p>
+<p class="mt-2">
+{% for key, item in wordpress.config.footer_social %}
+<a href="{{item.url}}" title="{{item.title}}" class="none">
+<i class="{{item.icon}} me-3 icon"></i>
+</a>{% endfor %}
+</p>
+</div>
+</div>
+<div class="row border-top border-dark">
+<div class="col-md-6 p-2">
+<p><a class="none" href="{{wordpress.config.url}}">{{wordpress.config.footer_copyrights}}</a></p>
+</div>
+<div class="col-md-6 p-2 text-end">
+<p>
+Built with <a href="https://www.11ty.dev/">{{ eleventy.generator }}</a> | 
+Maintance by 
+<a class="none" href="https://adamdjbrett.com">Adam Dj Brett</a></p>
+</div>
+</div>
+</div>
+</footer>
