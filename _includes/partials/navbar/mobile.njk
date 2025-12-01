@@ -1,0 +1,40 @@
+<nav class="border-dark border-bottom p-3 mobile">
+<div class="container">
+<div class="row">
+<div class="col-4">
+<a href="{{wordpress.config.url}}">
+<img class="img-fluid rounded-3" width="35" height="35" alt="{{wordpress.config.title}}" 
+src="{{wordpress.config.navbar_logo}}"/></a>
+</div>
+<div class="col-4 text-center">
+<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" 
+data-bs-target="#searchModal">
+<i class="{{wordpress.config.widget_search_icon}}"></i></button>
+</div>
+<div class="col-4 text-end">
+<button class="p-2 btn btn-outline-dark rounded-3"
+data-bs-toggle="collapse" href="#collapseMenu" role="button" aria-expanded="false" aria-controls="collapseMenu">
+<i class="fas fa-bars"></i></button>
+</div>
+</div>
+<div class="collapse mt-5" id="collapseMenu">
+<div class="col-12">
+<p class="text-center fw-bold">{{wordpress.config.title}}</p>
+<div class="p-0">
+{% for item in wordpress.config.navlist %}
+<p><small>
+<a href="{{item.url}}">{{item.nav}}</a>
+</small>
+</p>{% endfor %}
+<p class="border-bottom mt-3"><small>
+{{wordpress.config.navbar_dropdown_title}}
+</small></p>
+{% for key, item in wordpress.config.navdropdown_list %}<p><small>
+<a href="{{item.url}}">{{item.nav}}</a>
+</small>
+</p>{% endfor %}
+</div>
+</div>
+</div>
+</div>
+</nav>

@@ -1,0 +1,9 @@
+---
+layout: base.njk
+---
+<heading-anchor>
+{% if metadata.widget.toc_show %}
+<div class="card p-3">{{content|toc|safe}}</div>
+{% endif %}
+{{ content | safe }}
+</heading-anchor>

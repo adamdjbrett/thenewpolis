@@ -1,0 +1,68 @@
+---
+pagination:
+  data: collections.authors
+  size: 1
+  alias: author
+  addAllPagesToCollections: true
+eleventyExcludeFromCollections: false
+eleventyComputed:
+  permalink: "author/{{ author.slug }}/index.html" 
+  title: "{{ author.name }}"
+  description: "Article by {{ author.name }}"
+layout: base.njk
+---
+<div class="container">
+    <div class="col-md-8 mx-auto text-center mt-5 mb-4">
+        {% if author.profile_picture %}
+            <img src="{{ author.profile_picture }}" alt="Profile Picture of {{ author.name }}" class="author-avatar rounded-circle me-3" width="90" height="90">
+        {% endif %}
+        <div>
+            <h1 class="mb-0">{{ author.name }}</h1>
+            {% if author.website %}
+                <p class="mb-0">
+                    <a href="{{ author.website }}" target="_blank" rel="nofollow noopener">
+                        {{ author.website | replace('https://', '') | replace('http://', '') }}
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+    </div>   
+    <div class="p-3 text-center">
+        <p>{{ author.description }}</p>
+    </div>
+</div>
+
+<div class="container">
+<div class="p-3 border-widget-top">
+    <div class="row">
+{% for post in author.posts %}
+            <div class="col-md-4 mb-3 ">
+                <div class="p-1 borderio">
+                    <div class="rounded-3 border border-dark">
+                        <div class="image-wrapper-sub rounded-top-3">
+                         <a href="/post/{{ post.slug | default("") }}/"><img class="img-fluid img-cover rounded-top-3" width="100%" height="100%" 
+                            alt="{{post.title}}"
+                            src="{{post.featuredImage or wordpress.config.image }}"/></a>
+                        </div>
+                        <div class="p-3 border-dark border-bottom">
+                            <h3 class="fw-semibold normal">
+                                <a href="/post/{{post.slug}}/" class="text-dark">{{post.title}}</a>
+                            </h3>
+                        </div>
+                        <p class="row text-secondary mb-0 p-3">
+                            <span class="col-7"> 
+                                {{ post.category_names[0] | default('Kategori') }}
+                            </span>
+                            <span class="col-5 text-end"> 
+                                {{ post.date | readableDate }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+    </div>
+{% endfor %}
+</div>
+</div>
+</div>
+
+<p class="p-3 p-md-5 text-center"><a href="/authors/" class="btn btn-outline-dark rounded-3 btn-lg">All Authors</a></p>
