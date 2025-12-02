@@ -50,6 +50,10 @@ export default async function (eleventyConfig) {
 			class: 'icon-svg'
 		}
 	});
+		eleventyConfig.addPlugin(eleventyPluginPack11ty, {
+		responsiver: true,
+		minifyHtml: true,
+	});
 	eleventyConfig.addPlugin(pluginNavigation);
 	eleventyConfig.addPlugin(HtmlBasePlugin);
 	eleventyConfig.addPlugin(InputPathToUrlTransformPlugin);
