@@ -92,6 +92,8 @@ a {color: #000; font-weight: 700;}
 .icon {font-size: 20px;}
 .logo { object-fit:cover;}
 .tocus {padding: 30px;}
+img , iframe  {max-width:100%;}
+
 /* Mobile */
 @media (max-width: 600px) {
   .desktop {
