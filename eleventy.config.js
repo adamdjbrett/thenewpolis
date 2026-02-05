@@ -1,132 +1,172 @@
-import {
-	IdAttributePlugin,
-	InputPathToUrlTransformPlugin,
-	HtmlBasePlugin,
-} from "@11ty/eleventy";
-import { feedPlugin } from "@11ty/eleventy-plugin-rss";
-import pluginSyntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
-import pluginNavigation from "@11ty/eleventy-navigation";
-import yaml from "js-yaml";
-import { execSync } from "child_process";
+import { DateTime } from "luxon";
+import { readFileSync } from "fs";
 import markdownIt from "markdown-it";
-import fontAwesomePlugin from "@11ty/font-awesome";
-import pluginFilters from "./_config/filters.js";
-import configureWodam from "./_config/wodam.js";
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
-export default async function (eleventyConfig) {
-	configureWodam(eleventyConfig);
-	eleventyConfig.addPreprocessor("drafts", "*", (data, content) => {
-		if (data.draft && process.env.ELEVENTY_RUN_MODE === "build") {
-			return false;
-		}
-	});
-	eleventyConfig.addDataExtension("yaml", (contents) => yaml.load(contents));
-	eleventyConfig
-		.addPassthroughCopy({
-			"./public/": "/",
-		})
-		.addPassthroughCopy("./content/feed/pretty-atom-feed.xsl");
+import markdownItFootnote from "markdown-it-footnote";
+import toc from "eleventy-plugin-toc";
+import yaml from "js-yaml";
 
-	eleventyConfig.addWatchTarget("css/**/*.css");
-	eleventyConfig.addWatchTarget("content/**/*.{svg,webp,png,jpg,jpeg,gif}");
+export default function (eleventyConfig) {
+  eleventyConfig.addPlugin(toc);
 
-	eleventyConfig.addBundle("css", {
-		toFileDirectory: "dist",
-		bundleHtmlContentFromSelector: "style",
-	});
-	eleventyConfig.addBundle("js", {
-		toFileDirectory: "dist",
-		bundleHtmlContentFromSelector: 'script[type="module"]',
-	});
+  const md = markdownIt({ html: true, linkify: true });
+  md.use(markdownItFootnote);
+  eleventyConfig.setLibrary("md", md);
 
-	eleventyConfig.addPlugin(pluginSyntaxHighlight, {
-		preAttributes: { tabindex: 0 },
-	});
-		eleventyConfig.addPlugin(fontAwesomePlugin, {
-		transform: 'i[class]',
-		shortcode: false,
-		failOnError: true,
-		defaultAttributes: {
-			class: 'icon-svg'
-		}
-	});
-	eleventyConfig.addPlugin(pluginNavigation);
-	eleventyConfig.addPlugin(HtmlBasePlugin);
-	eleventyConfig.addPlugin(InputPathToUrlTransformPlugin);
-// creativitas code
-	const md = new markdownIt({
-		html: true,
-		breaks: true,
-		linkify: true,
-	});
-	eleventyConfig.addFilter("md", function (content) {
-		return md.render(content);
-	});
+  eleventyConfig.addPassthroughCopy({ "public/css": "css" });
+  eleventyConfig.addPassthroughCopy({ "public/images": "images" });
+  eleventyConfig.addPassthroughCopy({ "public/docs": "docs" });
+  eleventyConfig.addPassthroughCopy({
+    "node_modules/@zachleat/heading-anchors/heading-anchors.js": "js/heading-anchors.js"
+  });
 
+  eleventyConfig.addFilter("readableDate", (dateObj) => {
+    return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat("dd LLLL yyyy");
+  });
 
-	eleventyConfig.on("eleventy.after", () => {
-		execSync(`npx pagefind --site _site --glob \"**/*.html\"`, {
-			encoding: "utf-8",
-		});
-	});
+  eleventyConfig.addFilter("date", (dateObj, format) => {
+    return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat(format);
+  });
 
-	eleventyConfig.addPlugin(IdAttributePlugin, {
-		slugify: (text) => {
-			const slug = eleventyConfig.getFilter("slugify")(text);
-			return `print-${slug}`;
-		},
-	});
+  eleventyConfig.addFilter("htmlDateString", (dateObj) => {
+    return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat("yyyy-MM-dd");
+  });
 
+  eleventyConfig.addFilter("dateFilter", (dateObj, format) => {
+    return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat(format);
+  });
 
-// creativitas code
+  eleventyConfig.addFilter("isoDate", (dateObj) => {
+    return DateTime.fromJSDate(dateObj, { zone: "utc" }).toISO();
+  });
 
-	eleventyConfig.addPlugin(feedPlugin, {
-		type: "atom", // or "rss", "json"
-		outputPath: "/feed/feed.xml",
-		stylesheet: "pretty-atom-feed.xsl",
-		templateData: {
-			eleventyNavigation: {
-				key: "Feed",
-				order: 10,
-			},
-		},
-		collection: {
-			name: "all",
-			limit: 20,
-		},
-		metadata: {
-			language: "en",
-			title:
-				"The New Polis",
-			subtitle:
-				"New Polis.",
-			base: "https://www.example.com/",
-			author: {
-				name: "adamdjbrett",
-			},
-		},
-	});
+  eleventyConfig.addFilter("urlencode", (value) => {
+    return encodeURIComponent(value);
+  });
 
-	eleventyConfig.addPlugin(pluginFilters);
+  eleventyConfig.addFilter("baseUrl", (url) => {
+    if (!url || url === "/") {
+      return "http://localhost:8080";
+    }
+    return url.endsWith("/") ? url.slice(0, -1) : url;
+  });
 
-	eleventyConfig.addPlugin(IdAttributePlugin, {});
+  eleventyConfig.addFilter("absUrl", (path, base) => {
+    try {
+      return new URL(path, base).toString();
+    } catch {
+      return path;
+    }
+  });
+eleventyConfig.addDataExtension("yaml", (contents) => yaml.load(contents));
+  eleventyConfig.addFilter("limit", (array, limit) => {
+    return array.slice(0, limit);
+  });
 
-	eleventyConfig.addShortcode("currentBuildDate", () => {
-		return new Date().toISOString();
-	});
+  eleventyConfig.addFilter("filterByCategory", (posts, category) => {
+    return posts.filter((post) => {
+      return post.data.categories && post.data.categories.includes(category);
+    });
+  });
+
+  eleventyConfig.addFilter("filterByTag", (posts, tag) => {
+    return posts.filter((post) => {
+      return post.data.tags && post.data.tags.includes(tag);
+    });
+  });
+
+  eleventyConfig.addFilter("filterByAuthor", (posts, author) => {
+    return posts.filter((post) => {
+      return post.data.author === author;
+    });
+  });
+
+  eleventyConfig.addFilter("breadcrumbs", (dateObj, title, metadata) => {
+    if (!dateObj || !title) return [];
+    const dt = DateTime.fromJSDate(dateObj, { zone: "utc" });
+    return [
+      { text: metadata?.title || "The New Polis", url: "/" },
+      { text: dt.toFormat("yyyy"), url: `/${dt.toFormat("yyyy")}/` },
+      { text: dt.toFormat("MMMM"), url: `/${dt.toFormat("yyyy")}/${dt.toFormat("MM")}/` },
+      { text: dt.toFormat("dd"), url: `/${dt.toFormat("yyyy")}/${dt.toFormat("MM")}/${dt.toFormat("dd")}/` },
+      { text: title, url: null },
+    ];
+  });
+
+  const getPosts = (collectionApi) =>
+    collectionApi.getFilteredByGlob("content/posts/**/*.md").reverse();
+
+  eleventyConfig.addCollection("posts", (collectionApi) => {
+    return getPosts(collectionApi);
+  });
+
+  eleventyConfig.addCollection("conferences", (collectionApi) => {
+    return collectionApi.getFilteredByGlob("content/conferences/**/*.md").reverse();
+  });
+
+  eleventyConfig.addCollection("categories", function (collectionApi) {
+    let categories = new Set();
+    getPosts(collectionApi).forEach((item) => {
+      if (item.data.categories) {
+        item.data.categories.forEach((cat) => categories.add(cat));
+      }
+    });
+    return Array.from(categories).sort();
+  });
+
+  eleventyConfig.addCollection("tags", function (collectionApi) {
+    let tags = new Set();
+    getPosts(collectionApi).forEach((item) => {
+      if (item.data.tags) {
+        item.data.tags.forEach((tag) => tags.add(tag));
+      }
+    });
+    return Array.from(tags).sort();
+  });
+
+  eleventyConfig.addCollection("authors", function (collectionApi) {
+    let authors = new Set();
+    getPosts(collectionApi).forEach((item) => {
+      if (item.data.author) {
+        authors.add(item.data.author);
+      }
+    });
+    return Array.from(authors).sort();
+  });
+
+eleventyConfig.addCollection("authorPages", function (collectionApi) {
+  const authorsData = JSON.parse(readFileSync("./_data/authors.json", "utf-8"));
+  let posts = collectionApi.getFilteredByGlob("content/posts/**/*.md");
+  let authorPages = [];
+
+  Object.entries(authorsData).forEach(([key, author]) => {
+    let authorPosts = posts.filter((post) => {
+      const postAuthor = post.data.author;
+      if (!postAuthor) return false;
+      const normalizedPostAuthor = postAuthor.toLowerCase().replace(/\s+/g, '-');
+      
+      return postAuthor === author.name || normalizedPostAuthor === key;
+    });
+
+    authorPages.push({
+      key: key,
+      name: author.name,
+      bio: author.bio,
+      posts: authorPosts.sort((a, b) => b.date - a.date), 
+      url: `/author/${key}/`,
+    });
+  });
+
+  return authorPages;
+});
+
+  return {
+    dir: {
+      input: "content",
+      output: "_site",
+      includes: "../_includes",
+      data: "../_data",
+    },
+    markdownTemplateEngine: "njk",
+    htmlTemplateEngine: "njk",
+  };
 }
-
-export const config = {
-	templateFormats: ["md", "njk", "html", "liquid", "11ty.js"],
-
-	markdownTemplateEngine: "njk",
-
-	htmlTemplateEngine: "njk",
-
-	dir: {
-		input: "content", // default: "."
-		includes: "../_includes", // default: "_includes" (`input` relative)
-		data: "../_data", // default: "_data" (`input` relative)
-		output: "_site",
-	},
-};
