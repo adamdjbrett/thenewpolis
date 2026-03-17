@@ -5,12 +5,13 @@ language: "en"
 locale: "en_US"
 favicon: /images/jcrt-hero.webp
 url: https://localhost:8080
-email: hello@domain.com
+email: editor@thenewpolis.com
 
 metasocial: 
-  twitter: "https://x.com/user"
-  tweettwitteruser: "@user"
-  facebook: "https://fb.com/user"
+  twitter: "https://x.com/jourculreltheor"
+  twitteruser: "@jourculreltheor"
+  facebook: "https://www.facebook.com/religioustheory"
+  mastodon: "@jcrt@mastodon.social"
 
 hero: 
   title: THE NEW POLIS
